@@ -19,7 +19,7 @@ function Map() {
 
   useEffect(() => {
     const fetchCustomers = async () => {
-      const response = await axios.get('http://localhost:3001/api/customers');
+      const response = await axios.get(process.env.REACT_APP_API_URL);
       const customersWithDistance = await Promise.all(
         response.data.map(async (customer) => {
           const distance = await calculateDistance(predefinedLocation, customer.location);
@@ -32,7 +32,7 @@ function Map() {
   }, [predefinedLocation]);
 
   const calculateDistance = async (origin, destination) => {
-    const apiKey = 'YOUR_ACTUAL_GOOGLE_MAPS_API_KEY'; // Replace with your actual Google Maps API key
+    const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY; // Use the environment variable
     const url = `https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=${origin.lat},${origin.lng}&destinations=${destination.lat},${destination.lng}&key=${apiKey}`;
     const response = await axios.get(url);
     const distance = response.data.rows[0].elements[0].distance.text;
@@ -46,16 +46,19 @@ function Map() {
       time: new Date(),
     };
     setMarkers((current) => [...current, newMarker]);
+
+    // Display the latitude and longitude
+    console.log(`Latitude: ${newMarker.lat}, Longitude: ${newMarker.lng}`);
   }, []);
 
   return (
-    <LoadScript googleMapsApiKey="AIzaSyB27bN_9kPipglZaZDvwQ6o7xsgS13tBLo"> {/* Replace with your actual Google Maps API key */}
+    <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}> {/* Use the environment variable */}
       <GoogleMap
         mapContainerStyle={containerStyle}
         center={center}
         zoom={10}
         onClick={onMapClick}
-      >n card
+      >
         {markers.map((marker, index) => (
           <Marker
             key={index}
